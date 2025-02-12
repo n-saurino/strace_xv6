@@ -1,68 +1,59 @@
-# Instructions for the TA to run our implementation :
+# xv6 Strace Implementation
 
-### Part 1. 
-You can directly run the strace on Anubis and refer our document to evaluate on what all system calls we covered to explain this part.
+## Overview
+This project implements an `strace` command in the xv6 operating system, providing system call tracing functionality similar to Linux's `strace`. The implementation allows users to monitor system calls made by processes, filter calls based on success or failure, and store logs in a ring buffer for later retrieval.
 
-### Part 2.
-To follow along with our implementation to perform the strace operation. Do:
+## Features
+- **strace on/off**: Enables or disables system call tracing globally.
+- **strace run <command>**: Runs a specific command with tracing enabled.
+- **strace dump**: Retrieves the last N system call logs from the kernel ring buffer.
+- **strace -e <syscall>**: Filters tracing to a specific system call.
+- **strace -s / -f**: Filters successful or failed system calls.
+- **strace -o <filename>**: Saves traced system calls to a file.
+- **Child Process Tracing**: Captures system calls from child processes.
 
-a. 
-strace on
-echo hi
+## Implementation Details
+Our approach integrates `strace` directly into the xv6 shell (`sh.c`), modifying `syscall.c` to track system calls based on user commands. A kernel ring buffer stores the last N system calls, which can be retrieved using a `dump()` system call.
 
-Followed by:
-b. 
-strace off
+### Key Modifications:
+- **Shell (`sh.c`)**: Parses `strace` commands and sets global tracing flags.
+- **Syscall Handling (`syscall.c`)**: Logs system calls based on tracing state.
+- **Ring Buffer**: Stores the last N system calls for retrieval.
 
-And then,
-c.
-strace run echo Hello
+## Example Usage
+### Enabling Tracing
+```sh
+$ strace on
+$ ls
+[123] ls -> open() -> 3
+[123] ls -> read() -> 1024
+[123] ls -> close() -> 0
 
-d. 
-You can look into our code for the Ring buffer implementation.
-You can directly run the :
+### Tracing a Single Command
+$ strace run cat README.md
+[456] cat -> open() -> 3
+[456] cat -> read() -> 512
+[456] cat -> close() -> 0
 
-strace dump
+### Filtering Specific System Calls
+$ strace -e write echo "Hello"
+[789] echo -> write() -> 6
 
-e. 
-You can look into our code for the tracing and spawning child processes implementation.
+### Save Trace Logs to File
+$ strace -o trace_log.txt ls
+$ cat trace_log.txt
+[123] ls -> open() -> 3
+[123] ls -> read() -> 1024
+[123] ls -> close() -> 0
 
+## Example Usage
+![image](https://github.com/user-attachments/assets/8ee9ff82-26f2-4c6d-a2a2-9bc005f4bfa1)
 
-### Part 3. 
-You can try:
+## Challenges & Learnings
+ - **Kernel Space Constraints**: Debugging within xv6 required careful memory management to avoid kernel crashes.
+ - **Process Tracking**: Implementing per-process tracing required modifying global and process-specific flags.
+ - **Ring Buffer Limitations**: We initially struggled with dynamically allocating a flexible ring buffer, leading to a fixed-size implementation.
 
-strace on
-echo hi
-
-Also, 
-strace -e write 
-echo hello
-
-Similarly we can do for any system call or their combination.
-
-The line
- strace -s -e write echo hi 
-
-works perfectly for our implementation.
-
- Also note, For all of our flags, we implemented them to have the command run in the same line as the strace <flag> call as a demonstration that it only runs once like the “run” implementation above.
-
-
- We thought that this would be less confusing for the user who may not expect the flags to terminate after one run when they try to turn it on in one command and then use the flag for subsequent commands that they want to trace.  Our implementation for the strace command with flags takes the form: strace <flag> <flag e if included> <system call if flag e set> <command> (i.e. strace -s -e write echo hi). 
-
-
-
- We used similar logic to capture all of the flags for each shell command. We looped through every argument in the shell command and checked if any of them matched the four commands that we were asked to implement. We used global kernel variables to store the flags and a system call to set them after they’d been recorded in a local variable. We do all of the command/option parsing and execution of strace natively in the shell.
-
-
-
-### Part 4. 
-You can simply run:
-strace -o trace_log.txt 
-cat trace_log.txt
-
-To allow all the output to be captured in this file(create one if not already created) and display over the console.
-
-
-### Part 5. 
-You can look into our race.c(XV6) and raceAn.c(Anubis-Linux) file to look into the memory leak. 
+## Future Improvements
+ - Implementing dynamic ring buffer allocation.
+ - Extending filtering options for finer control over system call tracing.
