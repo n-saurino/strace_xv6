@@ -13,7 +13,7 @@ This project implements an `strace` command in the xv6 operating system, providi
 - **Child Process Tracing**: Captures system calls from child processes.
 
 ## Implementation Details
-Our approach integrates `strace` directly into the xv6 shell (`sh.c`), modifying `syscall.c` to track system calls based on user commands. A kernel ring buffer stores the last N system calls, which can be retrieved using a `dump()` system call.
+Our approach implemented `strace` as a system call in the kernel. We then integrated `strace` directly into the xv6 shell (`sh.c`), modifying `syscall.c` to track system calls based on user commands. A kernel ring buffer stores the last N system calls, which can be retrieved using a `dump()` system call.
 
 ### Key Modifications:
 - **Shell (`sh.c`)**: Parses `strace` commands and sets global tracing flags.
