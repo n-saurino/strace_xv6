@@ -53,7 +53,7 @@ $ cat trace_log.txt
 [123] ls -> close() -> 0
 ```
 
-## Example Usage
+## System Output
 ![image](https://github.com/user-attachments/assets/8ee9ff82-26f2-4c6d-a2a2-9bc005f4bfa1)
 
 ## Challenges & Learnings
