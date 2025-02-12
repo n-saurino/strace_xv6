@@ -28,23 +28,30 @@ $ ls
 [123] ls -> open() -> 3
 [123] ls -> read() -> 1024
 [123] ls -> close() -> 0
+```
 
 ### Tracing a Single Command
+```sh
 $ strace run cat README.md
 [456] cat -> open() -> 3
 [456] cat -> read() -> 512
 [456] cat -> close() -> 0
+```
 
 ### Filtering Specific System Calls
+```sh
 $ strace -e write echo "Hello"
 [789] echo -> write() -> 6
+```
 
 ### Save Trace Logs to File
+```sh
 $ strace -o trace_log.txt ls
 $ cat trace_log.txt
 [123] ls -> open() -> 3
 [123] ls -> read() -> 1024
 [123] ls -> close() -> 0
+```
 
 ## Example Usage
 ![image](https://github.com/user-attachments/assets/8ee9ff82-26f2-4c6d-a2a2-9bc005f4bfa1)
